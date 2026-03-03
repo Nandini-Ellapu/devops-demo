@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: devops-demo
-          image: nandhuacr123.azurecr.io/devops-demo:latest
+          image: nandhuacr123.azurecr.io/devops-demo:placeholder
           ports:
             - containerPort: 3000
 ---
