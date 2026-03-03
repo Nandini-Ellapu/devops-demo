@@ -1,4 +1,4 @@
-name: Build and Push to ACR
+name: CI-CD to AKS
 
 on:
   push:
@@ -8,9 +8,11 @@ on:
 env:
   ACR_NAME: nandhuacr123
   IMAGE_NAME: devops-demo
+  AKS_CLUSTER: devops-aks
+  RESOURCE_GROUP: DevOps-demo
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,3 +32,12 @@ jobs:
 
     - name: Push Docker Image
       run: docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}
+
+    - name: Get AKS Credentials
+      run: |
+        az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER --overwrite-existing
+
+    - name: Deploy to AKS
+      run: |
+        kubectl apply -f k8s/deployment.yaml
+        kubectl set image deployment/devops-demo devops-demo=$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}
