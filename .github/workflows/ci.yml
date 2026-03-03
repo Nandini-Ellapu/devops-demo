@@ -40,4 +40,5 @@ jobs:
     - name: Deploy to AKS
       run: |
         kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
         kubectl set image deployment/devops-demo devops-demo=$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}
