@@ -28,17 +28,26 @@ jobs:
       run: az acr login --name $ACR_NAME
 
     - name: Build Docker Image
-      run: docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }} .
+      run: |
+        docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }} .
 
     - name: Push Docker Image
-      run: docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}
+      run: |
+        docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}
 
     - name: Get AKS Credentials
       run: |
         az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER --overwrite-existing
 
-    - name: Deploy to AKS
+    - name: Deploy Kubernetes Manifests
       run: |
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
+
+    - name: Update Image in Deployment
+      run: |
         kubectl set image deployment/devops-demo devops-demo=$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}
+
+    - name: Verify Deployment
+      run: |
+        kubectl rollout status deployment/devops-demo
