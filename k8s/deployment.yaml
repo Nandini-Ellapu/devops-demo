@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: devops-demo
+  labels:
+    app: devops-demo
 spec:
   replicas: 1
   selector:
@@ -13,10 +15,12 @@ spec:
         app: devops-demo
     spec:
       containers:
-        - name: devops-demo
-          image: nandhuacr123.azurecr.io/devops-demo:dummy
-          ports:
-            - containerPort: 3000
+      - name: devops-demo
+        image: nandhuacr123.azurecr.io/devops-demo:latest
+        ports:
+        - containerPort: 3000
+        imagePullPolicy: Always
+
 ---
 apiVersion: v1
 kind: Service
@@ -27,5 +31,5 @@ spec:
   selector:
     app: devops-demo
   ports:
-    - port: 80
-      targetPort: 3000
+  - port: 80
+    targetPort: 3000
